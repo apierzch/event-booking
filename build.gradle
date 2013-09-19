@@ -5,5 +5,8 @@ repositories {
 }
 
 dependencies {
-    testCompile "junit:junit:4.11"
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.easytesting:fest-assert:1.4'
+    testCompile 'com.googlecode.catch-exception:catch-exception:1.0.4'
+    testCompile 'pl.pragmatists:JUnitParams:1.0.2'
 }
