@@ -57,7 +57,7 @@ public class Workshop {
     }
 
     public void addParticipant(Participant participant) {
-        if (limit == null || participants.size() < limit) {
+        if (hasFreePlaces()) {
             participants.add(participant);
         } else {
             throw new ParticipantsLimitReached();
@@ -70,5 +70,9 @@ public class Workshop {
 
     public void removeAllParticipants() {
         participants.clear();
+    }
+
+    public boolean hasFreePlaces() {
+        return limit == null || participants.size() < limit;
     }
 }
