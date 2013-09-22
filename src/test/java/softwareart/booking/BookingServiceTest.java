@@ -4,17 +4,22 @@ import com.googlecode.catchexception.CatchException;
 import com.googlecode.catchexception.apis.CatchExceptionBdd;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import softwareart.booking.exceptions.CollidingWorkshopsException;
+import softwareart.booking.exceptions.WorkshopNotFoundException;
+import softwareart.booking.persistence.PersistenceService;
 
 import java.util.Collection;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @RunWith(JUnitParamsRunner.class)
 public class BookingServiceTest {
 
-    private BookingService service = new BookingService();
+    private BookingService service;
 
     @Test
     public void shouldAddParticipant() {
@@ -43,8 +48,7 @@ public class BookingServiceTest {
 
         // then
         CatchExceptionBdd.then(CatchException.caughtException())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("No such workshop");
+                .isInstanceOf(WorkshopNotFoundException.class);
     }
 
     @Test
@@ -61,8 +65,7 @@ public class BookingServiceTest {
 
         // then
         CatchExceptionBdd.then(CatchException.caughtException())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Colliding workshops selected");
+                .isInstanceOf(CollidingWorkshopsException.class);
     }
 
     @Test
@@ -102,5 +105,10 @@ public class BookingServiceTest {
 
         assertThat(service.getParticipantsAt("workshop1")).isEmpty();
         assertThat(service.getParticipantsAt("workshop2")).containsOnly("test@test.com");
+    }
+
+    @Before
+    public void setup() {
+        service = new BookingService(mock(PersistenceService.class));
     }
 }
