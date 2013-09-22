@@ -32,7 +32,7 @@ public class BookingService {
         for (Workshop workshop : workshops) {
             for (Workshop testWorkshop : workshops) {
                 if (testWorkshop != workshop && workshop.collidesWith(testWorkshop)) {
-                    throw new CollidingWorkshopsException();
+                    throw CollidingWorkshopsException.forWorkshops(workshops);
                 }
             }
         }
@@ -63,7 +63,7 @@ public class BookingService {
 
     private Workshop getWorkshop(String workshopTitle) {
         if (!workshops.containsKey(workshopTitle)) {
-            throw new WorkshopNotFoundException();
+            throw new WorkshopNotFoundException("Could not find workshop with name: " + workshopTitle);
         }
         return workshops.get(workshopTitle);
     }
