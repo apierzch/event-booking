@@ -40,14 +40,14 @@ public class BookingService {
 
     private void makeBooking(String participantMail, Workshop[] workshops) {
         for (Workshop workshop : workshops) {
-            workshop.getParticipants().add(participantMail);
+            workshop.addParticipant(participantMail);
         }
         persistenceService.saveBooking(participantMail, workshops);
     }
 
     private void removeBookingFor(String participantMail) {
         for (Workshop workshop : this.workshops.values()) {
-            workshop.getParticipants().remove(participantMail);
+            workshop.removeParticipant(participantMail);
         }
         persistenceService.removeBookingFromFile(participantMail);
     }
@@ -88,7 +88,7 @@ public class BookingService {
 
     public void reloadBookings() {
         for (Workshop workshop : workshops.values()) {
-            workshop.getParticipants().clear();
+            workshop.removeAllParticipants();
         }
 
         persistenceService.makeBookingsBasedOnFile(this);

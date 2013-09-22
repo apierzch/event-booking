@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import softwareart.booking.exceptions.CollidingWorkshopsException;
+import softwareart.booking.exceptions.ParticipantsLimitReached;
 import softwareart.booking.exceptions.WorkshopNotFoundException;
 import softwareart.booking.persistence.PersistenceService;
 
@@ -105,6 +106,18 @@ public class BookingServiceTest {
 
         assertThat(service.getParticipantsAt("workshop1")).isEmpty();
         assertThat(service.getParticipantsAt("workshop2")).containsOnly("test@test.com");
+    }
+
+    @Test
+    public void shouldAllowForParticipantLimits() {
+        service.addWorkshop(new Workshop("workshop1", 1, 1).limit(1));
+
+        service.book("test@test.com", "workshop1");
+        CatchExceptionBdd.when(service).book("test2@test.com", "workshop1");
+
+        CatchExceptionBdd.then(CatchException.caughtException())
+                .isInstanceOf(ParticipantsLimitReached.class);
+
     }
 
     @Before

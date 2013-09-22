@@ -1,14 +1,19 @@
 package softwareart.booking;
 
+import softwareart.booking.exceptions.ParticipantsLimitReached;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import static java.util.Collections.unmodifiableCollection;
+
 public class Workshop {
-    private Set<String> participants = new HashSet<String>();
+    private Set<String> participants = new HashSet<>();
     private final String title;
     private final int start;
     private final int end;
+    private Integer limit = null;
 
     public Workshop(String title, int start, int end) {
         this.title = title;
@@ -37,7 +42,27 @@ public class Workshop {
     }
 
     public Collection<String> getParticipants() {
-        return participants;
+        return unmodifiableCollection(participants);
     }
 
+    public Workshop limit(int limit) {
+        this.limit = limit;
+        return this;
+    }
+
+    public void addParticipant(String mail) {
+        if (limit == null || participants.size() < limit) {
+            participants.add(mail);
+        } else {
+            throw new ParticipantsLimitReached();
+        }
+    }
+
+    public void removeParticipant(String mail) {
+        participants.remove(mail);
+    }
+
+    public void removeAllParticipants() {
+        participants.clear();
+    }
 }
