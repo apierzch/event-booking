@@ -9,7 +9,7 @@ import java.util.Set;
 import static java.util.Collections.unmodifiableCollection;
 
 public class Workshop {
-    private Set<String> participants = new HashSet<>();
+    private Set<Participant> participants = new HashSet<>();
     private final String title;
     private final int start;
     private final int end;
@@ -41,7 +41,7 @@ public class Workshop {
         return end;
     }
 
-    public Collection<String> getParticipants() {
+    public Collection<Participant> getParticipants() {
         return unmodifiableCollection(participants);
     }
 
@@ -50,16 +50,16 @@ public class Workshop {
         return this;
     }
 
-    public void addParticipant(String mail) {
+    public void addParticipant(Participant participant) {
         if (limit == null || participants.size() < limit) {
-            participants.add(mail);
+            participants.add(participant);
         } else {
             throw new ParticipantsLimitReached();
         }
     }
 
-    public void removeParticipant(String mail) {
-        participants.remove(mail);
+    public void removeParticipant(Participant participant) {
+        participants.remove(participant);
     }
 
     public void removeAllParticipants() {

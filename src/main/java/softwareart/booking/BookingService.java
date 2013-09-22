@@ -20,12 +20,12 @@ public class BookingService {
         this.persistenceService = persistenceService;
     }
 
-    public void book(String participantMail, String... workshopTitles) {
+    public void book(Participant participant, String... workshopTitles) {
         Workshop[] workshops = getWorkshops(workshopTitles);
 
         verifyCollisions(workshops);
-        removeBookingFor(participantMail);
-        makeBooking(participantMail, workshops);
+        removeBookingFor(participant);
+        makeBooking(participant, workshops);
     }
 
     private void verifyCollisions(Workshop[] workshops) {
@@ -38,18 +38,18 @@ public class BookingService {
         }
     }
 
-    private void makeBooking(String participantMail, Workshop[] workshops) {
+    private void makeBooking(Participant participant, Workshop[] workshops) {
         for (Workshop workshop : workshops) {
-            workshop.addParticipant(participantMail);
+            workshop.addParticipant(participant);
         }
-        persistenceService.saveBooking(participantMail, workshops);
+        persistenceService.saveBooking(participant, workshops);
     }
 
-    private void removeBookingFor(String participantMail) {
+    private void removeBookingFor(Participant participant) {
         for (Workshop workshop : this.workshops.values()) {
-            workshop.removeParticipant(participantMail);
+            workshop.removeParticipant(participant);
         }
-        persistenceService.removeBookingFromFile(participantMail);
+        persistenceService.removeBookingFromFile(participant);
     }
 
 
@@ -68,7 +68,7 @@ public class BookingService {
         return workshops.get(workshopTitle);
     }
 
-    public Collection<String> getParticipantsAt(String title) {
+    public Collection<Participant> getParticipantsAt(String title) {
         return getWorkshop(title).getParticipants();
     }
 

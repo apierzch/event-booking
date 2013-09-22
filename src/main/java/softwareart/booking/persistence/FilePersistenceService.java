@@ -1,6 +1,7 @@
 package softwareart.booking.persistence;
 
 import softwareart.booking.BookingService;
+import softwareart.booking.Participant;
 import softwareart.booking.Workshop;
 import softwareart.booking.exceptions.FileNotReadableException;
 import softwareart.booking.exceptions.FileNotRemovableException;
@@ -16,9 +17,11 @@ public class FilePersistenceService implements PersistenceService {
     }
 
     @Override
-    public void saveBooking(String participantMail, Workshop[] workshops) {
+    public void saveBooking(Participant participant, Workshop[] workshops) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            writer.write(participantMail);
+            writer.write(participant.getEmail());
+            writer.write(BookingService.SEPARATOR);
+            writer.write(participant.getName());
             for (Workshop workshop : workshops) {
                 writer.write(BookingService.SEPARATOR);
                 writer.write(workshop.getTitle());
@@ -30,14 +33,14 @@ public class FilePersistenceService implements PersistenceService {
     }
 
     @Override
-    public void removeBookingFromFile(String mail) {
+    public void removeBookingFromFile(Participant participant) {
         File tempFile = new File(file.getAbsolutePath() + ".tmp");
         try (BufferedReader br = new BufferedReader(new FileReader(file)); PrintWriter pw = new PrintWriter(new FileWriter(tempFile), true)) {
             String line;
             //Read from the original file and write to the new
             //unless content matches data to be removed.
             while ((line = br.readLine()) != null) {
-                if (!line.trim().startsWith(mail)) {
+                if (!line.trim().startsWith(participant.getEmail())) {
                     pw.println(line);
                 }
             }
@@ -58,13 +61,14 @@ public class FilePersistenceService implements PersistenceService {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] booking = line.split(";");
-                String[] workshops = new String[booking.length - 1];
-                String mail = booking[0];
-                System.arraycopy(booking, 1, workshops, 0, workshops.length);
-                bookingService.book(mail, workshops);
+                String[] workshops = new String[booking.length - 2];
+                Participant participant = new Participant(booking[0], booking[1]);
+                System.arraycopy(booking, 2, workshops, 0, workshops.length);
+                bookingService.book(participant, workshops);
             }
         } catch (IOException e) {
             throw new FileNotReadableException(e);
         }
     }
+
 }

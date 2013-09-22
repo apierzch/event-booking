@@ -1,7 +1,7 @@
+package softwareart.booking;
+
 import org.junit.Before;
 import org.junit.Test;
-import softwareart.booking.BookingService;
-import softwareart.booking.Workshop;
 import softwareart.booking.persistence.FilePersistenceService;
 
 import java.io.*;
@@ -17,20 +17,24 @@ public class BookingIntegrationTest {
     public void shouldSaveBooking() throws IOException {
         service.addWorkshop(new Workshop("workshop1", 1, 1));
 
-        service.book("test@test.com", "workshop1");
+        service.book(aParticipant("test@test.com"), "workshop1");
 
-        assertFileLines("test@test.com;workshop1");
+        assertFileLines("test@test.com;testName;workshop1");
+    }
+
+    private Participant aParticipant(String mail) {
+        return new Participant(mail, "testName");
     }
 
     @Test
     public void shouldAppendBookings() throws IOException {
         service.addWorkshop(new Workshop("workshop1", 1, 1));
 
-        service.book("test@test.com", "workshop1");
-        service.book("test1@test.com", "workshop1");
+        service.book(aParticipant("test@test.com"), "workshop1");
+        service.book(aParticipant("test1@test.com"), "workshop1");
 
-        assertFileLines("test@test.com;workshop1",
-                "test1@test.com;workshop1");
+        assertFileLines("test@test.com;testName;workshop1",
+                "test1@test.com;testName;workshop1");
     }
 
     @Test
@@ -38,13 +42,13 @@ public class BookingIntegrationTest {
         service.addWorkshop(new Workshop("workshop1", 1, 1));
         service.addWorkshop(new Workshop("workshop2", 2, 2));
 
-        service.book("test@test.com", "workshop1");
-        service.book("test2@test.com", "workshop2");
-        service.book("test@test.com", "workshop2");
+        service.book(aParticipant("test@test.com"), "workshop1");
+        service.book(aParticipant("test2@test.com"), "workshop2");
+        service.book(aParticipant("test@test.com"), "workshop2");
 
         assertFileLines(
-                "test2@test.com;workshop2",
-                "test@test.com;workshop2");
+                "test2@test.com;testName;workshop2",
+                "test@test.com;testName;workshop2");
     }
 
     @Test
@@ -55,9 +59,9 @@ public class BookingIntegrationTest {
         // when
         service.reloadBookings();
 
-        assertThat(service.getParticipantsAt("workshop1")).containsOnly("test@test.com", "test2@test.com");
-        assertThat(service.getParticipantsAt("workshop2")).containsOnly("test@test.com", "test1@test.com", "test2@test.com");
-        assertThat(service.getParticipantsAt("workshop3")).containsOnly("test1@test.com");
+        assertThat(service.getParticipantsAt("workshop1")).containsOnly(aParticipant("test@test.com"), aParticipant("test2@test.com"));
+        assertThat(service.getParticipantsAt("workshop2")).containsOnly(aParticipant("test@test.com"), aParticipant("test1@test.com"), aParticipant("test2@test.com"));
+        assertThat(service.getParticipantsAt("workshop3")).containsOnly(aParticipant("test1@test.com"));
     }
 
     private void givenExistingWorkshops() {
@@ -68,9 +72,9 @@ public class BookingIntegrationTest {
 
     private void givenFileWithBookings() throws IOException {
         PrintWriter writer = new PrintWriter(new FileWriter(file), true);
-        writer.println("test@test.com;workshop1;workshop2");
-        writer.println("test1@test.com;workshop3;workshop2");
-        writer.println("test2@test.com;workshop1;workshop2");
+        writer.println("test@test.com;testName;workshop1;workshop2");
+        writer.println("test1@test.com;testName;workshop3;workshop2");
+        writer.println("test2@test.com;testName;workshop1;workshop2");
         writer.close();
     }
 
