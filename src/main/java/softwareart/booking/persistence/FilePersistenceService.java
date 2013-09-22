@@ -61,6 +61,9 @@ public class FilePersistenceService implements PersistenceService {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
+                if(line.isEmpty()) {
+                    continue;
+                }
                 String[] booking = line.split(";");
                 Participant participant = new Participant(booking[0], booking[1]);
                 Integer[] workshops = new Integer[booking.length - 2];
