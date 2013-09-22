@@ -103,5 +103,4 @@ public class BookingServiceTest {
         assertThat(service.getParticipantsAt("workshop1")).isEmpty();
         assertThat(service.getParticipantsAt("workshop2")).containsOnly("test@test.com");
     }
-
 }

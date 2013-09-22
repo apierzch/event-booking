@@ -3,6 +3,7 @@ apply plugin: 'maven'
 
 group = 'softwareart'
 version = '1.0-SNAPSHOT'
+sourceCompatibility = '1.7'
 
 repositories {
     mavenCentral()
