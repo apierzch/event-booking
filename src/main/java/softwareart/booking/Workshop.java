@@ -65,7 +65,11 @@ public class Workshop {
     }
 
     public void removeParticipant(Participant participant) {
-        participants.remove(participant);
+        for (Participant p : participants) {
+            if (p.getEmail().equals(participant.getEmail())) {
+                participants.remove(participant);
+            }
+        }
     }
 
     public void removeAllParticipants() {
