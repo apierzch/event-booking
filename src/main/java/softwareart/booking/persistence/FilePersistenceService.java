@@ -10,6 +10,7 @@ import softwareart.booking.exceptions.FileNotWritableException;
 import java.io.*;
 
 public class FilePersistenceService implements PersistenceService {
+    public static final String SEPARATOR = ";";
     private File file;
 
     public FilePersistenceService(File file) {
@@ -20,11 +21,11 @@ public class FilePersistenceService implements PersistenceService {
     public void saveBooking(Participant participant, Workshop[] workshops) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             writer.write(participant.getEmail());
-            writer.write(BookingService.SEPARATOR);
+            writer.write(SEPARATOR);
             writer.write(participant.getName());
             for (Workshop workshop : workshops) {
-                writer.write(BookingService.SEPARATOR);
-                writer.write(workshop.getTitle());
+                writer.write(SEPARATOR);
+                writer.write(workshop.getId().toString());
             }
             writer.newLine();
         } catch (IOException e) {
@@ -61,9 +62,12 @@ public class FilePersistenceService implements PersistenceService {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] booking = line.split(";");
-                String[] workshops = new String[booking.length - 2];
                 Participant participant = new Participant(booking[0], booking[1]);
-                System.arraycopy(booking, 2, workshops, 0, workshops.length);
+                Integer[] workshops = new Integer[booking.length - 2];
+                for (int i = 2; i < booking.length; i++) {
+                    workshops[i - 2] = Integer.parseInt(booking[i]);
+                }
+
                 bookingService.book(participant, workshops);
             }
         } catch (IOException e) {

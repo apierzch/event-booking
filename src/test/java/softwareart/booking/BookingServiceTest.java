@@ -24,13 +24,13 @@ public class BookingServiceTest {
 
     @Test
     public void shouldAddParticipant() {
-        service.addWorkshop(new Workshop("workshop", 1, 1));
+        service.addWorkshop(new Workshop(0, "workshop", 1, 1));
 
         // when
-        service.book(participantForMail("test@test.com"), "workshop");
+        service.book(participantForMail("test@test.com"), 0);
 
         // then
-        assertThat(service.getParticipantsAt("workshop")).containsOnly(participantForMail("test@test.com"));
+        assertThat(service.getParticipantsAt(0)).containsOnly(participantForMail("test@test.com"));
     }
 
     private Participant participantForMail(String mail) {
@@ -39,17 +39,17 @@ public class BookingServiceTest {
 
     @Test
     public void newWorkshopShouldHaveNoParticipants() {
-        service.addWorkshop(new Workshop("workshop", 1, 1));
+        service.addWorkshop(new Workshop(0, "workshop", 1, 1));
 
-        assertThat(service.getParticipantsAt("workshop")).isEmpty();
+        assertThat(service.getParticipantsAt(0)).isEmpty();
     }
 
     @Test
     public void shouldThrowExceptionWhenWorkshopInvalid() {
-        service.addWorkshop(new Workshop("workshop", 1, 1));
+        service.addWorkshop(new Workshop(0, "workshop", 1, 1));
 
         // when
-        CatchExceptionBdd.when(service).book(participantForMail("test@test.com"), "invalidWorkshop");
+        CatchExceptionBdd.when(service).book(participantForMail("test@test.com"), 1);
 
         // then
         CatchExceptionBdd.then(CatchException.caughtException())
@@ -62,11 +62,11 @@ public class BookingServiceTest {
             "1,3, 2,2",
             "2,2, 1,3"})
     public void shouldNotAllowBookingForCollidingWorkshops(int firstStart, int firstEnd, int secondStart, int secondEnd) {
-        service.addWorkshop(new Workshop("workshop1", firstStart, firstEnd));
-        service.addWorkshop(new Workshop("workshop2", secondStart, secondEnd));
+        service.addWorkshop(new Workshop(0, "workshop1", firstStart, firstEnd));
+        service.addWorkshop(new Workshop(1, "workshop2", secondStart, secondEnd));
 
         // when
-        CatchExceptionBdd.when(service).book(participantForMail("test@test.com"), "workshop1", "workshop2");
+        CatchExceptionBdd.when(service).book(participantForMail("test@test.com"), 0, 1);
 
         // then
         CatchExceptionBdd.then(CatchException.caughtException())
@@ -75,17 +75,17 @@ public class BookingServiceTest {
 
     @Test
     public void shouldListCorrectSubset() {
-        Workshop workshop1 = new Workshop("workshop1", 1, 1);
+        Workshop workshop1 = new Workshop(0, "workshop1", 1, 1);
         service.addWorkshop(workshop1);
-        Workshop workshop2 = new Workshop("workshop2", 2, 2);
+        Workshop workshop2 = new Workshop(1, "workshop2", 2, 2);
         service.addWorkshop(workshop2);
-        Workshop workshop3 = new Workshop("workshop3", 3, 3);
+        Workshop workshop3 = new Workshop(2, "workshop3", 3, 3);
         service.addWorkshop(workshop3);
-        Workshop workshop4 = new Workshop("workshop4", 1, 2);
+        Workshop workshop4 = new Workshop(3, "workshop4", 1, 2);
         service.addWorkshop(workshop4);
-        Workshop workshop5 = new Workshop("workshop5", 2, 3);
+        Workshop workshop5 = new Workshop(4, "workshop5", 2, 3);
         service.addWorkshop(workshop5);
-        Workshop workshop6 = new Workshop("workshop6", 1, 3);
+        Workshop workshop6 = new Workshop(5, "workshop6", 1, 3);
         service.addWorkshop(workshop6);
 
         // when
@@ -101,23 +101,23 @@ public class BookingServiceTest {
 
     @Test
     public void shouldRemoveParticipantFromPreviousBooking() {
-        service.addWorkshop(new Workshop("workshop1", 1, 1));
-        service.addWorkshop(new Workshop("workshop2", 2, 2));
-        service.book(participantForMail("test@test.com"), "workshop1");
+        service.addWorkshop(new Workshop(0, "workshop1", 1, 1));
+        service.addWorkshop(new Workshop(1, "workshop2", 2, 2));
+        service.book(participantForMail("test@test.com"), 0);
 
         // when
-        service.book(participantForMail("test@test.com"), "workshop2");
+        service.book(participantForMail("test@test.com"), 1);
 
-        assertThat(service.getParticipantsAt("workshop1")).isEmpty();
-        assertThat(service.getParticipantsAt("workshop2")).containsOnly(participantForMail("test@test.com"));
+        assertThat(service.getParticipantsAt(0)).isEmpty();
+        assertThat(service.getParticipantsAt(1)).containsOnly(participantForMail("test@test.com"));
     }
 
     @Test
     public void shouldAllowForParticipantLimits() {
-        service.addWorkshop(new Workshop("workshop1", 1, 1).limit(1));
+        service.addWorkshop(new Workshop(0, "workshop1", 1, 1).limit(1));
 
-        service.book(participantForMail("test@test.com"), "workshop1");
-        CatchExceptionBdd.when(service).book(participantForMail("test2@test.com"), "workshop1");
+        service.book(participantForMail("test@test.com"), 0);
+        CatchExceptionBdd.when(service).book(participantForMail("test2@test.com"), 0);
 
         CatchExceptionBdd.then(CatchException.caughtException())
                 .isInstanceOf(ParticipantsLimitReached.class);

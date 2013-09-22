@@ -9,13 +9,15 @@ import java.util.Set;
 import static java.util.Collections.unmodifiableCollection;
 
 public class Workshop {
+    private Integer id;
     private Set<Participant> participants = new HashSet<>();
     private final String title;
     private final int start;
     private final int end;
     private Integer limit = null;
 
-    public Workshop(String title, int start, int end) {
+    public Workshop(int id, String title, int start, int end) {
+        this.id = id;
         this.title = title;
         this.start = start;
         this.end = end;
@@ -27,6 +29,10 @@ public class Workshop {
 
     private boolean startsDuring(Workshop workshop) {
         return this.start >= workshop.start && this.start <= workshop.end;
+    }
+
+    public Integer getId() {
+        return id;
     }
 
     public String getTitle() {

@@ -15,11 +15,11 @@ public class BookingIntegrationTest {
 
     @Test
     public void shouldSaveBooking() throws IOException {
-        service.addWorkshop(new Workshop("workshop1", 1, 1));
+        service.addWorkshop(new Workshop(0, "workshop1", 1, 1));
 
-        service.book(aParticipant("test@test.com"), "workshop1");
+        service.book(aParticipant("test@test.com"), 0);
 
-        assertFileLines("test@test.com;testName;workshop1");
+        assertFileLines("test@test.com;testName;0");
     }
 
     private Participant aParticipant(String mail) {
@@ -28,27 +28,27 @@ public class BookingIntegrationTest {
 
     @Test
     public void shouldAppendBookings() throws IOException {
-        service.addWorkshop(new Workshop("workshop1", 1, 1));
+        service.addWorkshop(new Workshop(0, "workshop1", 1, 1));
 
-        service.book(aParticipant("test@test.com"), "workshop1");
-        service.book(aParticipant("test1@test.com"), "workshop1");
+        service.book(aParticipant("test@test.com"), 0);
+        service.book(aParticipant("test1@test.com"), 0);
 
-        assertFileLines("test@test.com;testName;workshop1",
-                "test1@test.com;testName;workshop1");
+        assertFileLines("test@test.com;testName;0",
+                "test1@test.com;testName;0");
     }
 
     @Test
     public void shouldReplaceBooking() throws IOException {
-        service.addWorkshop(new Workshop("workshop1", 1, 1));
-        service.addWorkshop(new Workshop("workshop2", 2, 2));
+        service.addWorkshop(new Workshop(0, "workshop1", 1, 1));
+        service.addWorkshop(new Workshop(1, "workshop2", 2, 2));
 
-        service.book(aParticipant("test@test.com"), "workshop1");
-        service.book(aParticipant("test2@test.com"), "workshop2");
-        service.book(aParticipant("test@test.com"), "workshop2");
+        service.book(aParticipant("test@test.com"), 0);
+        service.book(aParticipant("test2@test.com"), 1);
+        service.book(aParticipant("test@test.com"), 1);
 
         assertFileLines(
-                "test2@test.com;testName;workshop2",
-                "test@test.com;testName;workshop2");
+                "test2@test.com;testName;1",
+                "test@test.com;testName;1");
     }
 
     @Test
@@ -59,22 +59,22 @@ public class BookingIntegrationTest {
         // when
         service.reloadBookings();
 
-        assertThat(service.getParticipantsAt("workshop1")).containsOnly(aParticipant("test@test.com"), aParticipant("test2@test.com"));
-        assertThat(service.getParticipantsAt("workshop2")).containsOnly(aParticipant("test@test.com"), aParticipant("test1@test.com"), aParticipant("test2@test.com"));
-        assertThat(service.getParticipantsAt("workshop3")).containsOnly(aParticipant("test1@test.com"));
+        assertThat(service.getParticipantsAt(0)).containsOnly(aParticipant("test@test.com"), aParticipant("test2@test.com"));
+        assertThat(service.getParticipantsAt(1)).containsOnly(aParticipant("test@test.com"), aParticipant("test1@test.com"), aParticipant("test2@test.com"));
+        assertThat(service.getParticipantsAt(2)).containsOnly(aParticipant("test1@test.com"));
     }
 
     private void givenExistingWorkshops() {
-        service.addWorkshop(new Workshop("workshop1", 1, 1));
-        service.addWorkshop(new Workshop("workshop2", 2, 2));
-        service.addWorkshop(new Workshop("workshop3", 3, 3));
+        service.addWorkshop(new Workshop(0, "workshop1", 1, 1));
+        service.addWorkshop(new Workshop(1, "workshop2", 2, 2));
+        service.addWorkshop(new Workshop(2, "workshop3", 3, 3));
     }
 
     private void givenFileWithBookings() throws IOException {
         PrintWriter writer = new PrintWriter(new FileWriter(file), true);
-        writer.println("test@test.com;testName;workshop1;workshop2");
-        writer.println("test1@test.com;testName;workshop3;workshop2");
-        writer.println("test2@test.com;testName;workshop1;workshop2");
+        writer.println("test@test.com;testName;0;1");
+        writer.println("test1@test.com;testName;2;1");
+        writer.println("test2@test.com;testName;0;1");
         writer.close();
     }
 

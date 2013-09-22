@@ -12,16 +12,15 @@ import java.util.Map;
 
 public class BookingService {
 
-    public static final String SEPARATOR = ";";
-    private Map<String, Workshop> workshops = new HashMap<>();
+    private Map<Integer, Workshop> workshops = new HashMap<>();
     private PersistenceService persistenceService;
 
     public BookingService(PersistenceService persistenceService) {
         this.persistenceService = persistenceService;
     }
 
-    public void book(Participant participant, String... workshopTitles) {
-        Workshop[] workshops = getWorkshops(workshopTitles);
+    public void book(Participant participant, Integer... workshopsIds) {
+        Workshop[] workshops = getWorkshops(workshopsIds);
 
         verifyCollisions(workshops);
         removeBookingFor(participant);
@@ -53,27 +52,27 @@ public class BookingService {
     }
 
 
-    private Workshop[] getWorkshops(String[] workshopTitles) {
-        Workshop[] workshops = new Workshop[workshopTitles.length];
+    private Workshop[] getWorkshops(Integer... workshopIds) {
+        Workshop[] workshops = new Workshop[workshopIds.length];
         for (int i = 0; i < workshops.length; i++) {
-            workshops[i] = getWorkshop(workshopTitles[i]);
+            workshops[i] = getWorkshop(workshopIds[i]);
         }
         return workshops;
     }
 
-    private Workshop getWorkshop(String workshopTitle) {
-        if (!workshops.containsKey(workshopTitle)) {
-            throw new WorkshopNotFoundException("Could not find workshop with name: " + workshopTitle);
+    private Workshop getWorkshop(Integer workshopId) {
+        if (!workshops.containsKey(workshopId)) {
+            throw new WorkshopNotFoundException("Could not find workshop with name: " + workshopId);
         }
-        return workshops.get(workshopTitle);
+        return workshops.get(workshopId);
     }
 
-    public Collection<Participant> getParticipantsAt(String title) {
-        return getWorkshop(title).getParticipants();
+    public Collection<Participant> getParticipantsAt(Integer workshopId) {
+        return getWorkshop(workshopId).getParticipants();
     }
 
     public void addWorkshop(Workshop workshop) {
-        workshops.put(workshop.getTitle(), workshop);
+        workshops.put(workshop.getId(), workshop);
     }
 
     public Collection<Workshop> getWorkshopsStartingAtSlot(int slot) {
