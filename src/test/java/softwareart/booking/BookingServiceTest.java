@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import softwareart.booking.exceptions.CollidingWorkshopsException;
+import softwareart.booking.exceptions.NoSuchBooking;
 import softwareart.booking.exceptions.ParticipantsLimitReached;
 import softwareart.booking.exceptions.WorkshopNotFoundException;
 import softwareart.booking.persistence.PersistenceService;
@@ -152,6 +153,19 @@ public class BookingServiceTest {
 
         CatchExceptionBdd.then(CatchException.caughtException())
                 .isInstanceOf(ParticipantsLimitReached.class);
+
+    }
+
+    @Test
+    public void shouldRejectInvalidConfirmation() {
+        service.addWorkshop(new Workshop(0, "workshop1", 1, 1));
+        service.addWorkshop(new Workshop(1, "workshop2", 2, 2));
+        service.book(participantForMail("test@test.com"), 0);
+
+        CatchExceptionBdd.when(service).confirm("test@test.com", 1);
+
+        CatchExceptionBdd.then(CatchException.caughtException())
+                .isInstanceOf(NoSuchBooking.class);
 
     }
 

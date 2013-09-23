@@ -2,6 +2,7 @@ package softwareart.booking;
 
 
 import softwareart.booking.exceptions.CollidingWorkshopsException;
+import softwareart.booking.exceptions.NoSuchBooking;
 import softwareart.booking.exceptions.WorkshopNotFoundException;
 import softwareart.booking.persistence.PersistenceService;
 
@@ -109,6 +110,7 @@ public class BookingService {
     }
 
     public void confirm(String mail, Integer... workshopIds) {
+        validateBooking(mail, workshopIds);
         List<Integer> idList = Arrays.asList(workshopIds);
         for (Integer id : workshops.keySet()) {
             if (!idList.contains(id)) {
@@ -118,5 +120,19 @@ public class BookingService {
             }
         }
         persistenceService.confirm(mail, workshopIds);
+    }
+
+    private void validateBooking(String mail, Integer[] workshopIds) {
+        for (Integer workshopId : workshopIds) {
+            boolean found = false;
+            for (Participant participant : workshops.get(workshopId).getParticipants()) {
+                if (participant.getEmail().equals(mail)) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                throw new NoSuchBooking();
+            }
+        }
     }
 }
