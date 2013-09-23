@@ -4,9 +4,11 @@ import softwareart.booking.BookingService;
 import softwareart.booking.Participant;
 import softwareart.booking.Workshop;
 
+import java.util.List;
+
 public interface PersistenceService {
 
-    void saveBooking(Participant participant, Workshop[] workshops);
+    void saveBooking(Participant participant, List<Workshop> workshops);
 
     void removeBookingFromFile(Participant participant);
 

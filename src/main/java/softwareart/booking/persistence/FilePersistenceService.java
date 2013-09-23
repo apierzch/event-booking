@@ -20,7 +20,7 @@ public class FilePersistenceService implements PersistenceService {
     }
 
     @Override
-    public void saveBooking(Participant participant, Workshop[] workshops) {
+    public void saveBooking(Participant participant, List<Workshop> workshops) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
             writer.write(participant.getEmail());
             writer.write(SEPARATOR);

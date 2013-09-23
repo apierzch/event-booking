@@ -17,13 +17,13 @@ public class BookingService {
     }
 
     public void book(Participant participant, Integer... workshopsIds) {
-        Workshop[] workshops = getWorkshops(workshopsIds);
+        List<Workshop> workshops = getWorkshops(workshopsIds);
 
         verifyCollisions(workshops);
         makeBooking(participant, workshops);
     }
 
-    private void verifyCollisions(Workshop[] workshops) {
+    private void verifyCollisions(List<Workshop> workshops) {
         for (Workshop workshop : workshops) {
             for (Workshop testWorkshop : workshops) {
                 if (testWorkshop != workshop && workshop.collidesWith(testWorkshop)) {
@@ -33,7 +33,7 @@ public class BookingService {
         }
     }
 
-    private void makeBooking(Participant participant, Workshop[] workshops) {
+    private void makeBooking(Participant participant, List<Workshop> workshops) {
         for (Workshop workshop : workshops) {
             workshop.addParticipant(participant);
         }
@@ -54,13 +54,13 @@ public class BookingService {
         persistenceService.removeBookingFromFile(participant);
     }
 
-    private Workshop[] getWorkshops(Integer... workshopIds) {
-        Workshop[] workshops = new Workshop[workshopIds.length];
-        for (int i = 0; i < workshops.length; i++) {
-            if (workshops[i] == null) {
+    private List<Workshop> getWorkshops(Integer... workshopIds) {
+        List<Workshop> workshops = new ArrayList<>();
+        for (Integer workshopId : workshopIds) {
+            if (workshopId == null) {
                 continue;
             }
-            workshops[i] = getWorkshop(workshopIds[i]);
+            workshops.add(getWorkshop(workshopId));
         }
         return workshops;
     }
