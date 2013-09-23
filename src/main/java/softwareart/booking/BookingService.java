@@ -40,13 +40,19 @@ public class BookingService {
         persistenceService.saveBooking(participant, workshops);
     }
 
+    public void bookLocal(Participant participant, Integer[] workshops) {
+        for (Integer workshopId : workshops) {
+            this.workshops.get(workshopId).addParticipant(participant);
+        }
+    }
+
+
     private void removeBookingFor(Participant participant) {
         for (Workshop workshop : this.workshops.values()) {
             workshop.removeParticipant(participant);
         }
         persistenceService.removeBookingFromFile(participant);
     }
-
 
     private Workshop[] getWorkshops(Integer... workshopIds) {
         Workshop[] workshops = new Workshop[workshopIds.length];

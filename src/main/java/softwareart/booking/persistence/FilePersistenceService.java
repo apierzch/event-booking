@@ -75,7 +75,7 @@ public class FilePersistenceService implements PersistenceService {
                     workshops[i - 3] = Integer.parseInt(booking[i]);
                 }
 
-                bookingService.book(participant, workshops);
+                bookingService.bookLocal(participant, workshops);
             }
         } catch (IOException e) {
             throw new FileNotReadableException(e);
