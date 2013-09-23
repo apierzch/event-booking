@@ -57,6 +57,9 @@ public class BookingService {
     private Workshop[] getWorkshops(Integer... workshopIds) {
         Workshop[] workshops = new Workshop[workshopIds.length];
         for (int i = 0; i < workshops.length; i++) {
+            if (workshops[i] == null) {
+                continue;
+            }
             workshops[i] = getWorkshop(workshopIds[i]);
         }
         return workshops;
