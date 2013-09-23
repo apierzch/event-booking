@@ -5,10 +5,7 @@ import softwareart.booking.exceptions.CollidingWorkshopsException;
 import softwareart.booking.exceptions.WorkshopNotFoundException;
 import softwareart.booking.persistence.PersistenceService;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 public class BookingService {
 
@@ -91,6 +88,16 @@ public class BookingService {
         }
 
         persistenceService.makeBookingsBasedOnFile(this);
+    }
+
+    public Collection<Workshop> getWorkshopsById(Integer... workshopIds) {
+        List<Workshop> workshops = new ArrayList<>();
+        for (Integer workshopId : workshopIds) {
+            if (this.workshops.containsKey(workshopId)) {
+                workshops.add(this.workshops.get(workshopId));
+            }
+        }
+        return workshops;
     }
 
 }
