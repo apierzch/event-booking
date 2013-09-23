@@ -100,7 +100,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    public void shouldRemoveParticipantFromPreviousBooking() {
+    public void shouldNotRemoveParticipantFromPreviousBooking() {
         service.addWorkshop(new Workshop(0, "workshop1", 1, 1));
         service.addWorkshop(new Workshop(1, "workshop2", 2, 2));
         service.book(participantForMail("test@test.com"), 0);
@@ -108,8 +108,39 @@ public class BookingServiceTest {
         // when
         service.book(participantForMail("test@test.com"), 1);
 
+        assertThat(service.getParticipantsAt(0)).containsOnly(participantForMail("test@test.com"));
+        assertThat(service.getParticipantsAt(1)).containsOnly(participantForMail("test@test.com"));
+    }
+
+    @Test
+    public void shouldRemoveParticipantFromPreviousBookingWhenConfirmed() {
+        service.addWorkshop(new Workshop(0, "workshop1", 1, 1));
+        service.addWorkshop(new Workshop(1, "workshop2", 2, 2));
+        service.book(participantForMail("test@test.com"), 0);
+
+        // when
+        service.book(participantForMail("test@test.com"), 1);
+        service.confirm("test@test.com", 1);
+
         assertThat(service.getParticipantsAt(0)).isEmpty();
         assertThat(service.getParticipantsAt(1)).containsOnly(participantForMail("test@test.com"));
+    }
+
+    @Test
+    public void shouldLeaveOnlyOneInWorkshopWhenConfimed() {
+        service.addWorkshop(new Workshop(0, "workshop1", 1, 1));
+        service.addWorkshop(new Workshop(1, "workshop2", 2, 2));
+        service.book(participantForMail("test@test.com"), 0, 1);
+
+        // when
+        service.book(participantForMail("test@test.com"), 0);
+        assertThat(service.getParticipantsAt(0)).hasSize(2);
+        assertThat(service.getParticipantsAt(1)).hasSize(1);
+
+        service.confirm("test@test.com", 0);
+        assertThat(service.getParticipantsAt(0)).hasSize(1);
+        assertThat(service.getParticipantsAt(1)).hasSize(0);
+        assertThat(service.getParticipantsAt(0).iterator().next().isConfirmed()).isTrue();
     }
 
     @Test

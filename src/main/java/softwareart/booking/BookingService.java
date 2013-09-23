@@ -20,7 +20,6 @@ public class BookingService {
         Workshop[] workshops = getWorkshops(workshopsIds);
 
         verifyCollisions(workshops);
-        removeBookingFor(participant);
         makeBooking(participant, workshops);
     }
 
@@ -100,4 +99,15 @@ public class BookingService {
         return workshops;
     }
 
+    public void confirm(String mail, Integer... workshopIds) {
+        List<Integer> idList = Arrays.asList(workshopIds);
+        for (Integer id : workshops.keySet()) {
+            if (!idList.contains(id)) {
+                workshops.get(id).removeParticipantByMail(mail);
+            } else {
+                workshops.get(id).ensureOnlyOne(mail);
+            }
+        }
+        persistenceService.confirm(mail, workshopIds);
+    }
 }

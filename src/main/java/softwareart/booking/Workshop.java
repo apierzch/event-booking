@@ -2,15 +2,16 @@ package softwareart.booking;
 
 import softwareart.booking.exceptions.ParticipantsLimitReached;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Iterator;
+import java.util.List;
 
 import static java.util.Collections.unmodifiableCollection;
 
 public class Workshop {
     private Integer id;
-    private Set<Participant> participants = new HashSet<>();
+    private List<Participant> participants = new ArrayList<>();
     private final String title;
     private final int start;
     private final int end;
@@ -65,9 +66,16 @@ public class Workshop {
     }
 
     public void removeParticipant(Participant participant) {
-        for (Participant p : participants) {
-            if (p.getEmail().equals(participant.getEmail())) {
-                participants.remove(participant);
+        String email = participant.getEmail();
+        removeParticipantByMail(email);
+    }
+
+    public void removeParticipantByMail(String email) {
+        Iterator<Participant> iterator = participants.iterator();
+        while (iterator.hasNext()) {
+            Participant p = iterator.next();
+            if (p.getEmail().equals(email)) {
+                iterator.remove();
             }
         }
     }
@@ -78,5 +86,21 @@ public class Workshop {
 
     public boolean hasFreePlaces() {
         return limit == null || participants.size() < limit;
+    }
+
+    public void ensureOnlyOne(String mail) {
+        Iterator<Participant> iterator = participants.iterator();
+        boolean firstFound = false;
+        while (iterator.hasNext()) {
+            Participant p = iterator.next();
+            if (p.getEmail().equals(mail)) {
+                if (firstFound) {
+                    iterator.remove();
+                } else {
+                    firstFound = true;
+                    p.confirm();
+                }
+            }
+        }
     }
 }

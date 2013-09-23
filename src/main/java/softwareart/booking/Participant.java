@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Participant implements Serializable {
     private String name;
     private String email;
+    private boolean confirmed;
 
     public Participant(String email, String name) {
         this.name = name;
@@ -45,5 +46,13 @@ public class Participant implements Serializable {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (email != null ? email.hashCode() : 0);
         return result;
+    }
+
+    public Boolean isConfirmed() {
+        return confirmed;
+    }
+
+    public void confirm() {
+        confirmed = true;
     }
 }

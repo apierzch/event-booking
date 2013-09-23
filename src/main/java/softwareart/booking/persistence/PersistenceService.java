@@ -11,4 +11,6 @@ public interface PersistenceService {
     void removeBookingFromFile(Participant participant);
 
     void makeBookingsBasedOnFile(BookingService bookingService);
+
+    void confirm(String mail, Integer... workshopIds);
 }

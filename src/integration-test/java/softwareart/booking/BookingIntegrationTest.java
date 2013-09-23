@@ -8,6 +8,7 @@ import java.io.*;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+
 public class BookingIntegrationTest {
 
     private File file;
@@ -19,7 +20,7 @@ public class BookingIntegrationTest {
 
         service.book(aParticipant("test@test.com"), 0);
 
-        assertFileLines("test@test.com;testName;0");
+        assertFileLines("test@test.com;testName;false;0");
     }
 
     private Participant aParticipant(String mail) {
@@ -33,12 +34,12 @@ public class BookingIntegrationTest {
         service.book(aParticipant("test@test.com"), 0);
         service.book(aParticipant("test1@test.com"), 0);
 
-        assertFileLines("test@test.com;testName;0",
-                "test1@test.com;testName;0");
+        assertFileLines("test@test.com;testName;false;0",
+                "test1@test.com;testName;false;0");
     }
 
     @Test
-    public void shouldReplaceBooking() throws IOException {
+    public void shouldNotReplaceBooking() throws IOException {
         service.addWorkshop(new Workshop(0, "workshop1", 1, 1));
         service.addWorkshop(new Workshop(1, "workshop2", 2, 2));
 
@@ -47,8 +48,26 @@ public class BookingIntegrationTest {
         service.book(aParticipant("test@test.com"), 1);
 
         assertFileLines(
-                "test2@test.com;testName;1",
-                "test@test.com;testName;1");
+                "test@test.com;testName;false;0",
+                "test2@test.com;testName;false;1",
+                "test@test.com;testName;false;1");
+    }
+
+    @Test
+    public void shouldConfirmBooking() throws IOException {
+        service.addWorkshop(new Workshop(0, "workshop1", 1, 1));
+        service.addWorkshop(new Workshop(1, "workshop2", 2, 2));
+        service.book(aParticipant("test@test.com"), 0, 1);
+
+        // when
+        service.book(aParticipant("test@test.com"), 0);
+        assertFileLines(
+                "test@test.com;testName;false;0;1",
+                "test@test.com;testName;false;0");
+
+        service.confirm("test@test.com", 0);
+        assertFileLines(
+                "test@test.com;testName;true;0");
     }
 
     @Test
@@ -72,9 +91,9 @@ public class BookingIntegrationTest {
 
     private void givenFileWithBookings() throws IOException {
         PrintWriter writer = new PrintWriter(new FileWriter(file), true);
-        writer.println("test@test.com;testName;0;1");
-        writer.println("test1@test.com;testName;2;1");
-        writer.println("test2@test.com;testName;0;1");
+        writer.println("test@test.com;testName;false;0;1");
+        writer.println("test1@test.com;testName;false;2;1");
+        writer.println("test2@test.com;testName;false;0;1");
         writer.close();
     }
 
