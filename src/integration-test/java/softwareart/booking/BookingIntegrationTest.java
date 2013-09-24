@@ -81,6 +81,9 @@ public class BookingIntegrationTest {
         assertThat(service.getParticipantsAt(0)).containsOnly(aParticipant("test@test.com"), aParticipant("test2@test.com"));
         assertThat(service.getParticipantsAt(1)).containsOnly(aParticipant("test@test.com"), aParticipant("test1@test.com"), aParticipant("test2@test.com"));
         assertThat(service.getParticipantsAt(2)).containsOnly(aParticipant("test1@test.com"));
+        assertThat(service.getParticipantsAt(0).iterator().next().isConfirmed()).isTrue();
+        assertThat(service.getParticipantsAt(1).iterator().next().isConfirmed()).isTrue();
+        assertThat(service.getParticipantsAt(2).iterator().next().isConfirmed()).isFalse();
     }
 
     private void givenExistingWorkshops() {
@@ -91,7 +94,7 @@ public class BookingIntegrationTest {
 
     private void givenFileWithBookings() throws IOException {
         PrintWriter writer = new PrintWriter(new FileWriter(file), true);
-        writer.println("test@test.com;testName;false;0;1");
+        writer.println("test@test.com;testName;true;0;1");
         writer.println("test1@test.com;testName;false;2;1");
         writer.println("test2@test.com;testName;false;0;1");
         writer.close();

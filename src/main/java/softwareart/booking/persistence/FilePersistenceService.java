@@ -70,6 +70,9 @@ public class FilePersistenceService implements PersistenceService {
                 }
                 String[] booking = line.split(";");
                 Participant participant = new Participant(booking[0], booking[1]);
+                if(Boolean.parseBoolean(booking[2])) {
+                    participant.confirm();
+                }
                 Integer[] workshops = new Integer[booking.length - 3];
                 for (int i = 3; i < booking.length; i++) {
                     workshops[i - 3] = Integer.parseInt(booking[i]);
