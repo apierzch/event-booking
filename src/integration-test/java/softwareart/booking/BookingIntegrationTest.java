@@ -58,16 +58,20 @@ public class BookingIntegrationTest {
         service.addWorkshop(new Workshop(0, "workshop1", 1, 1));
         service.addWorkshop(new Workshop(1, "workshop2", 2, 2));
         service.book(aParticipant("test@test.com"), 0, 1);
-
-        // when
+        service.book(aParticipant("test@test.com"), 0, 1);
         service.book(aParticipant("test@test.com"), 0);
+        service.book(aParticipant("test1@test.com"), 0, 1);
         assertFileLines(
                 "test@test.com;testName;false;0;1",
-                "test@test.com;testName;false;0");
+                "test@test.com;testName;false;0;1",
+                "test@test.com;testName;false;0",
+                "test1@test.com;testName;false;0;1");
 
-        service.confirm("test@test.com", 0);
+        // when
+        service.confirm("test@test.com", 0, 1);
         assertFileLines(
-                "test@test.com;testName;true;0");
+                "test@test.com;testName;true;0;1",
+                "test1@test.com;testName;false;0;1");
     }
 
     @Test

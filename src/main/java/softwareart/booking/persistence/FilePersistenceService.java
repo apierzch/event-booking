@@ -7,8 +7,13 @@ import softwareart.booking.exceptions.FileNotReadableException;
 import softwareart.booking.exceptions.FileNotRemovableException;
 import softwareart.booking.exceptions.FileNotWritableException;
 
-import java.io.*;
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 public class FilePersistenceService implements PersistenceService {
@@ -87,22 +92,25 @@ public class FilePersistenceService implements PersistenceService {
 
     @Override
     public void confirm(String mail, Integer... workshopIds) {
-        List<Integer> idList = Arrays.asList(workshopIds);
-
         File tempFile = new File(file.getAbsolutePath() + ".tmp");
         try (BufferedReader br = new BufferedReader(new FileReader(file)); PrintWriter pw = new PrintWriter(new FileWriter(tempFile), true)) {
             String line;
+            boolean alreadyConfirmed = false;
             while ((line = br.readLine()) != null) {
                 if (line.isEmpty())
                     continue;
+                outer:
                 if (line.startsWith(mail)) {
-                    String[] split = line.split(";");
-                    if (split.length - 3 == workshopIds.length) {
-                        for (int i = 3; i < split.length; i++) {
-                            if (!split[i].equals(workshopIds[i - 3].toString())) {
-                                break;
+                    if(!alreadyConfirmed) {
+                        String[] split = line.split(";");
+                        if (split.length - 3 == workshopIds.length) {
+                            for (int i = 3; i < split.length; i++) {
+                                if (!split[i].equals(workshopIds[i - 3].toString())) {
+                                    break outer;
+                                }
                             }
                             pw.println(line.replace(";false;", ";true;"));
+                            alreadyConfirmed = true;
                         }
                     }
                 } else {
